@@ -27,6 +27,26 @@ cargo test
 CI runs the same, plus `cargo doc`, `cargo audit` and a build on the minimum
 supported Rust version (`rust-version` in `Cargo.toml`).
 
+## Commit messages and releases
+
+Versions follow [semver](https://semver.org) and are decided by commit messages, so
+please write [Conventional Commits](https://www.conventionalcommits.org). When a pull
+request is squash-merged its **title** becomes the commit message, so the title is the
+one that matters.
+
+| Title | Next version |
+|---|---|
+| `feat!: ...` or a `BREAKING CHANGE:` footer | major (minor while the crate is `0.y.z`) |
+| `feat: ...` | minor (patch while `0.y.z`) |
+| `fix: ...`, `perf: ...` | patch |
+| `docs:`, `chore:`, `ci:`, `test:`, `refactor:`, ... | no release |
+
+A bot keeps a **Release merge request** (on GitLab) up to date with the changelog and
+the next version, bumped in `Cargo.toml` and `Cargo.lock`. Merging it releases: the
+crate is published to crates.io from that merge. Don't edit `RELEASE-NOTES.md` or the
+`version` in `Cargo.toml` by hand. If nothing since the last release is a `feat`, `fix`,
+`perf` or breaking change, there is simply no release.
+
 ## License
 
 By submitting a contribution you agree to license it under the project's
