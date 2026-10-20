@@ -1,3 +1,5 @@
 /target
 .efatura-session.json
 .efatura-pending.json
+# CI keeps CARGO_HOME inside the project; untracked files make `cargo publish` refuse to run
+.cargo/

@@ -91,7 +91,11 @@ Mirror to GitHub:
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh
     # GitHub's published ed25519 host key (https://api.github.com/meta).
     - echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" > ~/.ssh/known_hosts
-    - cp "$GITHUB_DEPLOY_KEY" ~/.ssh/github_deploy_key && chmod 600 ~/.ssh/github_deploy_key
+    # OpenSSH rejects a private key without a trailing newline, and CI/CD variables
+    # often lose it: always end the copy with one.
+    - |
+      { cat "$GITHUB_DEPLOY_KEY"; echo; } > ~/.ssh/github_deploy_key
+      chmod 600 ~/.ssh/github_deploy_key
     - export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/github_deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
     - git push git@github.com:samuelbarata/efatura.git HEAD:refs/heads/master
 
@@ -99,16 +103,19 @@ Mirror to GitHub:
 # crates.io versions are immutable, so a push that leaves the version alone is a
 # no-op: releasing means bumping `version` in Cargo.toml.
 #
-# Needs CARGO_REGISTRY_TOKEN (crates.io API token) as a masked, *protected* CI/CD
-# variable; without it the job is not created at all. By default the job is
+# Only runs after "Mirror to GitHub" succeeded, so a version is never published
+# from a source that is not in sync with the public repository. Needs both
+# CARGO_REGISTRY_TOKEN (crates.io API token, masked and *protected*) and
+# GITHUB_DEPLOY_KEY (for the mirror); without either the job is not created at
+# all, so there is no way to publish while skipping the mirror. By default the job is
 # manual (a deliberate click, e.g. for the very first release); set the CI/CD
 # variable AUTO_PUBLISH=true to publish on every master pipeline.
 Publish Crate:
   stage: deploy
-  needs: [Test, Check, Clippy, Security Audit, Package Dry Run]
+  needs: [Test, Check, Clippy, Security Audit, Package Dry Run, Mirror to GitHub]
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CARGO_REGISTRY_TOKEN && $AUTO_PUBLISH == "true"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CARGO_REGISTRY_TOKEN'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CARGO_REGISTRY_TOKEN && $GITHUB_DEPLOY_KEY && $AUTO_PUBLISH == "true"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CARGO_REGISTRY_TOKEN && $GITHUB_DEPLOY_KEY'
       when: manual
       allow_failure: true
   script:
