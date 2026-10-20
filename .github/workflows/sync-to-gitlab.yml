@@ -1,0 +1,45 @@
+name: Sync to GitLab
+
+# GitLab (repo.barata.pt/finances/efatura) is where releases are published from;
+# GitLab push-mirrors master back to this repository. This is the other direction:
+# once a pull request is merged here, fast-forward GitLab's master to it.
+#
+# Fast-forward only, never forced: if GitLab has a commit this repository lacks,
+# the push is rejected and someone has to rebase by hand. Pushing a commit GitLab
+# already has is a no-op, so the two directions can't loop.
+#
+# Triggered only by pushes to master (never by pull_request), so forks can't reach
+# the secret.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-to-gitlab
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'samuelbarata/efatura'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Push master to GitLab (fast-forward only)
+        env:
+          # GitLab project access token: role Developer, scope write_repository, and
+          # allowed to push to the protected master branch.
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          set -euo pipefail
+          auth=$(printf 'oauth2:%s' "$GITLAB_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          git -c http.extraheader="Authorization: Basic $auth" \
+            push https://repo.barata.pt/finances/efatura.git HEAD:refs/heads/master

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt" class="no-js">
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15"><title>e-fatura</title></head>
+<body>
+  <!-- Synthetic fixture modelled on detalheDocumentoAdquirente.action (no real data). -->
+  <div class="container home fatsorte-messages">
+    <div class='alert alert-success  hide '><button type="button" class="close">&#215;</button><span></span></div>
+    <div class="alert alert-error  hide "><span></span></div>
+  </div>
+  <input class="span2 uneditable-input" id="dataEmissaoDocumentoDesc" value="2023-10-21" disabled/>
+  <input class="span3 uneditable-input" id="hashAdquirenteDesc" value="CDUA" disabled/>
+  <label for="ambitoAquisicaoDesc">Atividade de Realização da Aquisição</label>
+  <span class="input-xxlarge uneditable-input" id="ambitoAquisicaoDesc">
+      Alojamento, restauração e similares
+  </span>
+  <select class="input-xxlarge" id="ambitoAquisicao" name="ambitoAquisicao">
+    <option value="" ></option>
+    <option value="C01" >Manutenção e reparação de veículos automóveis</option>
+    <option value="C03" >Alojamento, restauração e similares</option>
+    <option value="C05" >Saúde</option>
+    <option value="C99" >Outros</option>
+  </select>
+  <form id="resolverPendencia" action="resolverPendenciaAdquirente.action" method="post">
+    <input type="hidden" name="idDocumento" value="100000000001"/>
+    <input type="hidden" name="ambitoAquisicaoPend"/>
+  </form>
+  <script type="text/javascript">
+    dadosLinhasDocumento = [{"valorBaseTributavel":1661,"valorIva":382,"valorTotal":2043,"regiaoFiscal":null,"taxaIva":2300,"tipoTaxaIva":"IVA","motivoIsencao":null,"motivoIsencaoDesc":"","docsOrigem":[],"idLinha":100000000002,"paisTaxa":"PT","paisTaxaDesc":"PORTUGAL"}];
+    Opensoft.factemipf.DetalheDocumentoAdquirente.loadDataTableAdquirente({
+        data: dadosLinhasDocumento,
+        idDocumento: 100000000001,
+        dataEmissaoDocumento: '2023-10-21'
+    });
+  </script>
+</body>
+</html>

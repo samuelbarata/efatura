@@ -1,0 +1,41 @@
+[package]
+name = "efatura"
+version = "0.1.0"
+edition = "2024"
+description = "Unofficial client for Portugal's e-fatura portal, with resumable SMS two-factor login"
+keywords = ["efatura", "portugal", "invoices", "irs", "at"]
+categories = ["api-bindings", "web-programming::http-client"]
+license = "MIT-0"
+repository = "https://github.com/samuelbarata/efatura"
+readme = "README.md"
+# Highest `rust-version` declared by a dependency (time, cookie_store); enforced by
+# the MSRV job in .github/workflows/ci.yml.
+rust-version = "1.88"
+# Keep CI config, local session files and the test suite (its fixtures are pages
+# captured from the real portal) out of the published package.
+exclude = [
+    ".github/",
+    ".gitlab-ci.yml",
+    "renovate.json",
+    ".efatura-session.json",
+    "tests/",
+]
+
+[dependencies]
+chrono = { version = "0.4.45", features = ["serde"] }
+cookie = "0.18"
+cookie_store = { version = "0.22", features = ["serde_json"] }
+regex = "1.13.1"
+reqwest = { version = "0.13", features = ["cookies", "json", "form"] }
+scraper = "0.27"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+thiserror = "2"
+tracing = "0.1.44"
+url = { version = "2.5.8", features = ["serde"] }
+
+[dev-dependencies]
+rpassword = "7"
+tokio = { version = "1.53.3", features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+wiremock = "0.6"

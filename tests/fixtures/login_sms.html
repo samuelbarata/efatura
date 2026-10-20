@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head><meta charset="UTF-8"/><title>acesso.gov.pt</title></head>
+<body>
+<!-- Synthetic fixture modelled on the acesso.gov.pt login app's server-rendered state:
+     only the fields this crate reads, with placeholder values (no real data). -->
+<script id="data-attributes" type="application/json">{"path":"painelAdquirente.action","partID":"EFPF"}</script>
+<script id="data-sispart" type="application/json">{"isispart":"EFPF","fPermissaoPartilhaDados":"F"}</script>
+<script id="data-field-error" type="application/json"></script>
+<div id="root"></div>
+<script type="text/javascript">
+  function parseBoolean(value) {return value !== null && value !== undefined && String(value).toLowerCase() === "true"}
+  function stringOrNull(value){return value ? value : null}
+
+  var model = {
+    partID: `EFPF`,
+    path: `painelAdquirente.action`,
+    _csrf: {
+      parameterName: `_csrf`,
+      token: `00000000-0000-0000-0000-000000000002`
+    },
+    attributes: JSON.parse(document.getElementById('data-attributes').textContent || null),
+    authVersion: stringOrNull('1'),
+    urlLogin: stringOrNull('submissaoFormularioLogin'),
+    loginSuccess: parseBoolean(''),
+    globalError: ``,
+    fieldError: JSON.parse(document.getElementById('data-field-error').textContent || null),
+    is2FA: parseBoolean('true'),
+    phone: stringOrNull('*******321'),
+    nifIn2FA: stringOrNull('123456789'),
+    smsFailed: parseBoolean(''),
+    codeExpired2Fa: parseBoolean(''),
+    sendsRemaining: parseInt('3') || null,
+    showFiabilizacaoModal: parseBoolean(''),
+    codigoErrado: parseBoolean(''),
+    userSuspenso: parseBoolean(''),
+  }
+  window.startLogin(model)
+</script>
+</body>
+</html>
