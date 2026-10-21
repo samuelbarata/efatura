@@ -151,8 +151,9 @@ Mirror Tags to GitHub:
 #
 # Needs both CARGO_REGISTRY_TOKEN (crates.io API token, masked and *protected*) and
 # GITHUB_DEPLOY_KEY (for the mirror); without either the job is not created at all,
-# so there is no way to publish while skipping the mirror. On any other master push
-# the job is a manual one (a deliberate click, e.g. to retry a failed publish).
+# so there is no way to publish while skipping the mirror. Master pushes that don't
+# land a release get no publish job at all; to retry a failed publish, retry this job
+# in the release's pipeline.
 #
 # It refuses to publish if RELEASE-NOTES.md and Cargo.toml disagree on the version,
 # and is a no-op when that version is already on crates.io (versions are immutable).
@@ -163,9 +164,6 @@ Publish Crate:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CARGO_REGISTRY_TOKEN && $GITHUB_DEPLOY_KEY'
       changes:
         paths: [RELEASE-NOTES.md]
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CARGO_REGISTRY_TOKEN && $GITHUB_DEPLOY_KEY'
-      when: manual
-      allow_failure: true
   script:
     - NAME=$(sed -n 's/^name *= *"\(.*\)"/\1/p' Cargo.toml | head -1)
     - VERSION=$(sed -n 's/^version *= *"\(.*\)"/\1/p' Cargo.toml | head -1)
